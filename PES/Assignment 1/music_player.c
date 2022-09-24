@@ -49,6 +49,7 @@ void add_song(playlist_t* playlist, int song_id, int where) // TODO: add a song 
 void delete_song(playlist_t* playlist, int song_id) // TODO: remove song id from the playlist
 {
 	delete_node(playlist->list, song_id);
+	playlist->num_songs = size(playlist);
 }
 
 song_t* search_song(playlist_t* playlist, int song_id) // TODO: return a pointer to the node where the song id is present in the playlist
@@ -76,6 +77,7 @@ void play_next(playlist_t* playlist, music_queue_t* q) // TODO: play the next so
 			}
 			else{
 				play_song(playlist->last_song->next->data);
+				playlist->last_song = playlist->last_song->next;
 			}
 		}
 	}
@@ -86,22 +88,56 @@ void play_next(playlist_t* playlist, music_queue_t* q) // TODO: play the next so
 
 void play_previous(playlist_t* playlist) // TODO: play the previous song from the linked list
 {
+	if(is_empty(playlist->list)) return;
+	else{
+		if(!playlist->last_song || !playlist->last_song->prev){
+			play_song(playlist->list->tail->data);
+			playlist->last_song = playlist->list->tail;
+		}
+		else{
+			play_song(playlist->last_song->prev->data);
+			playlist->last_song = playlist->last_song->prev;
+		}
+	}	
 }
 
 void play_from_queue(music_queue_t* q) // TODO: play a song from the queue
 {
+	if(!empty(q)){
+		play_song(dequeue(q));
+	}
+
 }
 
 void insert_to_queue(music_queue_t* q, int song_id) // TODO: insert a song id to the queue
 {
+	enqueue(q, song_id);
 }
 
 void reverse(playlist_t* playlist) // TODO: reverse the order of the songs in the given playlist. (Swap the nodes, not data)
 {
+	song_t* trav = playlist->head->next;
+	song_t* curr = NULL;
+	playlist->list->tail = playlist->list->head;
+	while(trav){
+		curr = trav;
+		trav = trav->next;
+		curr->prev->next = curr->next;
+		curr->next->prev = curr->prev;
+		curr->next = playlist->list->head;
+		curr->prev = NULL;
+		playlist->list->head->prev = curr;
+		playlist->list->head = curr;
+	}		
 }
 
 void k_swap(playlist_t* playlist, int k) // TODO: swap the node at position i with node at position i+k upto the point where i+k is less than the size of the linked list
 {
+	song_t* trav = playlist->list->head;
+	song_t* swap = trav;
+	for(int i=0; i+k<playlist->num_songs; i++){
+		
+	}
 }
 
 void shuffle(playlist_t* playlist, int k) // TODO: perform k_swap and reverse
