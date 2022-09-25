@@ -24,6 +24,7 @@ void insert_front(list_t* list, int data)  // TODO: inserts data to the beginnin
 		
 	}
 	else{
+		list->head->prev = temp;
 		temp->next = list->head;
 		list->head = temp;
 	}
@@ -75,6 +76,7 @@ void delete_front(list_t* list) // TODO: delete the start node from the linked l
 	node_t* t = list->head;
 	if(t){
 		list->head = list->head->next;
+		list->head->prev = NULL;
 		free(t);
 		list->size--;
 	}	
@@ -85,6 +87,7 @@ void delete_back(list_t* list) // TODO: delete the end node from the linked list
 	node_t* t = list->tail;
 	if(t){
 		list->tail = list->tail->prev;
+		list->tail = NULL;
 		free(t);
 		list->size--;
 	}
