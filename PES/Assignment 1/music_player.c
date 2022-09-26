@@ -49,7 +49,7 @@ void add_song(playlist_t* playlist, int song_id, int where) // TODO: add a song 
 void delete_song(playlist_t* playlist, int song_id) // TODO: remove song id from the playlist
 {
 	delete_node(playlist->list, song_id);
-	playlist->num_songs = size(playlist);
+	playlist->num_songs = size(playlist->list);
 }
 
 song_t* search_song(playlist_t* playlist, int song_id) // TODO: return a pointer to the node where the song id is present in the playlist
@@ -116,7 +116,7 @@ void insert_to_queue(music_queue_t* q, int song_id) // TODO: insert a song id to
 
 void reverse(playlist_t* playlist) // TODO: reverse the order of the songs in the given playlist. (Swap the nodes, not data)
 {
-	song_t* trav = playlist->head->next;
+	song_t* trav = playlist->list->head->next;
 	song_t* curr = NULL;
 	playlist->list->tail = playlist->list->head;
 	while(trav){
@@ -135,17 +135,52 @@ void k_swap(playlist_t* playlist, int k) // TODO: swap the node at position i wi
 {
 	song_t* trav = playlist->list->head;
 	song_t* swap = trav;
+	if(k>playlist->num_songs) return;
+	for(int i=0; i<k; i++){
+		swap = swap->next;
+	}
 	for(int i=0; i+k<playlist->num_songs; i++){
-		
+		song_t temp = *swap;
+		trav->next->prev = swap;
+		swap->prev->next = trav;
+		if(i==0){
+			swap->next->prev = trav;
+		}
+		else if(i+k == playlist->num_songs-1){
+			trav->prev->next = swap;
+		}
+		else{
+			swap->next->prev = trav;
+			trav->prev->next = swap;
+		}
+		swap->next = trav->next;
+		swap->prev = trav->prev;
+		trav->next = temp.next;
+		trav->prev = temp.prev;
+
+		song_t* temp_tr = swap;
+		swap = trav;
+		trav = temp_tr;
+
+		swap = swap->next;
+		trav = trav->next;
 	}
 }
 
 void shuffle(playlist_t* playlist, int k) // TODO: perform k_swap and reverse
 {
+	k_swap(playlist, k);
+	reverse(playlist);
 }
 
 song_t* debug(playlist_t* playlist) // TODO: if the given linked list has a cycle, return the start of the cycle, else return null. Check cycles only in forward direction i.e with the next pointer. No need to check for cycles in the backward pointer.
-{
+{	
+	song_t* trav = playlist->list->head; 
+	song_t* tar = playlist->list->tail;
+	while(trav && trav!=tar){
+		trav = trav->next;
+	}
+	return trav;
 }
 
 void display_playlist(playlist_t* p) // Displays the playlist
