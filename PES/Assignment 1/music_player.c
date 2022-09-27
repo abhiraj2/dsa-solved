@@ -7,7 +7,7 @@
 playlist_t* create_playlist() // return a newly created doubly linked list
 {
 	// DO NOT MODIFY!!!
-	playlist_t* playlist = (playlist_t*) malloc(sizeof(playlist));
+	playlist_t* playlist = (playlist_t*) malloc(sizeof(playlist_t));
 	playlist->list = create_list();
 	playlist->num_songs = 0;
 	playlist->last_song = NULL;
@@ -38,10 +38,13 @@ void add_song(playlist_t* playlist, int song_id, int where) // TODO: add a song 
 	switch(where){
 		case -1:
 			insert_front(playlist->list, song_id);
+			break;
 		case -2:
 			insert_back(playlist->list, song_id);
+			break;
 		default:
 			insert_after(playlist->list, song_id, where);
+			break;
 	}
 	playlist->num_songs = size(playlist->list);
 }
@@ -123,7 +126,7 @@ void reverse(playlist_t* playlist) // TODO: reverse the order of the songs in th
 		curr = trav;
 		trav = trav->next;
 		curr->prev->next = curr->next;
-		curr->next->prev = curr->prev;
+		if(curr->next) curr->next->prev = curr->prev;
 		curr->next = playlist->list->head;
 		curr->prev = NULL;
 		playlist->list->head->prev = curr;
@@ -139,31 +142,30 @@ void k_swap(playlist_t* playlist, int k) // TODO: swap the node at position i wi
 	for(int i=0; i<k; i++){
 		swap = swap->next;
 	}
-	for(int i=0; i+k<playlist->num_songs; i++){
-		song_t temp = *swap;
+	while(swap){
 		trav->next->prev = swap;
-		swap->prev->next = trav;
-		if(i==0){
-			swap->next->prev = trav;
-		}
-		else if(i+k == playlist->num_songs-1){
-			trav->prev->next = swap;
-		}
-		else{
-			swap->next->prev = trav;
-			trav->prev->next = swap;
-		}
-		swap->next = trav->next;
-		swap->prev = trav->prev;
-		trav->next = temp.next;
-		trav->prev = temp.prev;
-
-		song_t* temp_tr = swap;
-		swap = trav;
-		trav = temp_tr;
-
-		swap = swap->next;
-		trav = trav->next;
+			if(trav==playlist->list->head){
+				playlist->list->head = swap;
+			} else{
+				trav->prev->next = swap;
+			}
+			song_t* snext = swap->next;
+			song_t* sprev = swap->prev;
+			swap->next = trav->next;
+			swap->prev = trav->prev;
+			if(swap == playlist->list->tail){
+				playlist->list->tail = trav;
+			} else{
+				snext->prev = trav;	
+			}
+			sprev->next = trav;
+			trav->next = snext;
+			trav->prev = sprev;
+			
+			
+			song_t* temp = trav;
+			trav=swap->next;
+			swap=temp->next;
 	}
 }
 
@@ -175,12 +177,8 @@ void shuffle(playlist_t* playlist, int k) // TODO: perform k_swap and reverse
 
 song_t* debug(playlist_t* playlist) // TODO: if the given linked list has a cycle, return the start of the cycle, else return null. Check cycles only in forward direction i.e with the next pointer. No need to check for cycles in the backward pointer.
 {	
-	song_t* trav = playlist->list->head; 
 	song_t* tar = playlist->list->tail;
-	while(trav && trav!=tar){
-		trav = trav->next;
-	}
-	return trav;
+	return tar->next;
 }
 
 void display_playlist(playlist_t* p) // Displays the playlist

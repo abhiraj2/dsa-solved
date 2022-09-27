@@ -18,7 +18,7 @@ play_next
 play_next
 insert_to_queue 1
 display_playlist
-shuffle
+shuffle 1
 display_playlist
 debug 5 3
 delete_playlist

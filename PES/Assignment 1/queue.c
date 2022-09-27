@@ -9,14 +9,17 @@ queue_t* create_queue()   // return a newly created empty queue
 	Q->list = create_list();
 	Q->front = Q->list->head;
 	Q->rear = Q->list->tail;
-	Q->size = Q->list->size;
+	Q->size = Q->list->size; 
 	return Q;
 }
 
 void enqueue(queue_t* q, int data) // TODO: insert data at the end of a queue
-{
+{	
+	int k=0;
+	if(empty(q)) k = 1;
 	insert_back(q->list,data);
 	q->rear = q->list->tail;
+	if(k) q->front = q->rear;
 	q->size = q->list->size;
 }
 
@@ -24,6 +27,7 @@ int dequeue(queue_t* q) 	// TODO: return the data at the front of a queue and re
 {	int ele = front(q);
 	delete_front(q->list);
 	q->front = q->list->head;
+	if(empty(q)) q->rear = NULL;
 	q->size = q->list->size;
 }
 
